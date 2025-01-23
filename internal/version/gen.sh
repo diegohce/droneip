@@ -1,13 +1,16 @@
 #!/bin/bash
 
-version=$(git describe)
+commit=$(git rev-parse HEAD)
+
+version=$(git tag --contains "$commit")
 if [ $? -ne 0 ]; then
     version="untagged"
 fi
+if [ -z "$version" ]; then
+    version="untagged"
+fi
 
-commit=$(git log --pretty=oneline -1 | cut -d ' ' -f 1)
 when=$(git log -1 | grep Date | sed 's/Date: *//')
-
 
 
 cat <<EOF > vars.go
@@ -18,10 +21,12 @@ cat <<EOF > vars.go
 // 'git describe' && 'git log' commands output
 package version
 
-
 var (
-	VERSION string = "$version"
-    COMMIT  string = "$commit"
-    WHEN    string = "$when"
+    Handler = versionHandler{
+        Version: "$version",
+        Commit:  "$commit",
+        When:    "$when",
+    }
 )
+
 EOF
