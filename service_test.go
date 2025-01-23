@@ -17,8 +17,8 @@ func TestService(t *testing.T) {
 	}))
 	defer remoteServer.Close()
 
-	config.Values.Set("INSPECT_HEADER", "X-TestHeader")
-	config.Values.Set("DESTINATION_URL", remoteServer.URL)
+	config.Set("INSPECT_HEADER", "X-TestHeader")
+	config.Set("DESTINATION_URL", remoteServer.URL)
 
 	cache, _ := mx2.NewMXCache("memory://")
 

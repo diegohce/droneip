@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/diegohce/droneip/healthcheck"
 	"github.com/diegohce/droneip/internal/version"
 
 	"github.com/diegohce/droneip/ctcodecs"
@@ -28,9 +29,11 @@ func NewAdminCentre(cache mx2.MXCacher) *AdminCentre {
 	r := http.ServeMux{}
 
 	ac := AdminCentre{cache, &r}
+	hc := healthcheck.HealthCheck(cache)
 
 	ac.r.Handle("GET /droneip/keys", http.HandlerFunc(ac.cacheKeys))
 	ac.r.Handle("GET /droneip/version", http.HandlerFunc(version.Version))
+	ac.r.Handle("GET /droneip/health_check", hc)
 
 	return &ac
 }

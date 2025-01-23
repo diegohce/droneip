@@ -4,6 +4,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/diegohce/droneip/config"
@@ -14,19 +15,23 @@ import (
 
 func main() {
 
-	config.Values.FromEnvWithPrefix("DRONEIP_")
+	config.FromEnvWithPrefix("DRONEIP_")
 
-	if config.Values.Get("DESTINATION_URL", "NN") == "NN" {
+	if config.Get("DESTINATION_URL", "NN") == "NN" {
 		logger.LogError("destination URL not set").Write()
-		return
+		os.Exit(1)
 	}
 
-	cache, _ := mx2.NewMXCache(config.Values.Get("CACHE_URL", ""))
+	cache, err := mx2.NewMXCache(config.Get("CACHE_URL", ""))
+	if err != nil {
+		logger.LogError("error starting cache", "err", err.Error()).Write()
+		os.Exit(1)
+	}
 
 	ac := NewAdminCentre(cache)
-	go http.ListenAndServe(config.Values.Get("ADMIN_BIND", ":8081"), ac)
+	go http.ListenAndServe(config.Get("ADMIN_BIND", ":8081"), ac)
 
-	ttl, err := time.ParseDuration(config.Values.Get("CACHE_TTL", "24h"))
+	ttl, err := time.ParseDuration(config.Get("CACHE_TTL", "24h"))
 	if err != nil {
 		ttl, _ = time.ParseDuration("24h")
 	}
@@ -38,8 +43,8 @@ func main() {
 	http.Handle("/", &handler)
 
 	logger.LogInfo("starting droneip MiM",
-		"bind", config.Values.Get("BIND", ":8080"),
-		"forwarding_to", config.Values.Get("DESTINATION_URL")).Write()
+		"bind", config.Get("BIND", ":8080"),
+		"forwarding_to", config.Get("DESTINATION_URL")).Write()
 
-	http.ListenAndServe(config.Values.Get("BIND", ":8080"), nil)
+	http.ListenAndServe(config.Get("BIND", ":8080"), nil)
 }

@@ -28,7 +28,7 @@ func (h *DroneHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	remoteIP := strings.SplitN(r.RemoteAddr, ":", 2)[0]
 
-	inspectHeader := config.Values.Get("INSPECT_HEADER")
+	inspectHeader := config.Get("INSPECT_HEADER")
 	if inspectHeader != "" {
 		remoteIP = r.Header.Get(inspectHeader)
 	}
@@ -60,7 +60,7 @@ func (h *DroneHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	destURL := config.Values.Get("DESTINATION_URL")
+	destURL := config.Get("DESTINATION_URL")
 
 	req, err := http.NewRequest(r.Method, destURL, r.Body)
 	if err != nil {

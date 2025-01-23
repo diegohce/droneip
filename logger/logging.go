@@ -32,20 +32,18 @@ func getExtraFields(fields map[string]interface{}) []interface{} {
 func writeLogLine(w io.Writer, le LogEntry) {
 
 	logLevel := slog.LevelInfo
-	if l := os.Getenv("KIUGO_LOGGER_LOGLEVEL"); l != "" {
+	if l := os.Getenv("LOGGER_LOGLEVEL"); l != "" {
 		var err error
 		logLevel, err = parseLevel(l)
 		if err != nil {
 			logLevel = slog.LevelInfo
 			slog.With(err).
-				Error("Error parsing log level in KIUGO_LOGGER_LOGLEVEL. Using default 'info' level")
+				Error("Error parsing log level in LOGGER_LOGLEVEL. Using default 'info' level")
 		}
 	}
 
 	logBuffer := bytes.Buffer{}
 
-	// Use io.MultiWriter to write to both os.Stdout and logBuffer
-	//mainLogger := slog.New(slog.NewJSONHandler(io.MultiWriter(w, &logBuffer), &slog.HandlerOptions{
 	mainLogger := slog.New(slog.NewJSONHandler(&logBuffer, &slog.HandlerOptions{
 		Level: logLevel,
 		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
@@ -69,8 +67,7 @@ func writeLogLine(w io.Writer, le LogEntry) {
 		lvl = slog.LevelInfo
 	}
 
-	args := le.Attributes()
-	args = append(args, slog.Group("extra_fields", getExtraFields(le.Fields())...))
+	args := getExtraFields(le.Fields())
 	mainLogger.Log(context.Background(), lvl, le.Message(), args...)
 
 	var maskedLogLine string

@@ -105,17 +105,8 @@ func (l LogEntry) Fields() map[string]interface{} {
 	return l.fields
 }
 
-// SetField adds an extra_field with name 'name' of value 'value'.
+// SetField adds an extra field with name 'name' of value 'value'.
 func (l LogEntry) SetField(name string, value interface{}) LogEntry {
 	l.fields[name] = value
-	return l
-}
-
-func (l LogEntry) Attributes() []interface{} {
-	return l.attrs
-}
-
-func (l LogEntry) SetAttribute(name string, value interface{}) LogEntry {
-	l.attrs = append(l.attrs, name, value)
 	return l
 }

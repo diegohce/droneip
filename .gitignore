@@ -1,2 +1,4 @@
+.vscode/*
 coverage.out
 internal/version/vars.go
+mxcache/cache.dat

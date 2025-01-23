@@ -9,8 +9,8 @@ import (
 
 func TestHappyTrail(t *testing.T) {
 
-	config.Values.FromEnv()
-	config.Values.FromEnvWithPrefix("TEST_")
+	config.FromEnv()
+	config.FromEnvWithPrefix("TEST_")
 
 	expected := []string{
 		"localhost",
@@ -21,10 +21,10 @@ func TestHappyTrail(t *testing.T) {
 
 	values := make([]string, 4)
 
-	values[0] = config.Values.Get("HOSTNAME")
-	values[1] = config.Values.Get("USERNAME")
-	values[2] = config.Values.Get("PASSWORD")
-	values[3] = config.Values.Get("PORT", "8080")
+	values[0] = config.Get("HOSTNAME")
+	values[1] = config.Get("USERNAME")
+	values[2] = config.Get("PASSWORD")
+	values[3] = config.Get("PORT", "8080")
 
 	for i, v := range values {
 		if v != expected[i] {
@@ -32,9 +32,9 @@ func TestHappyTrail(t *testing.T) {
 		}
 	}
 
-	config.Values.Set("PARAM", "pampam")
+	config.Set("PARAM", "pampam")
 
-	if v := config.Values.Get("PARAM"); v != "pampam" {
+	if v := config.Get("PARAM"); v != "pampam" {
 		t.Fatal("expected 'pampam' got", v)
 	}
 
