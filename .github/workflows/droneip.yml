@@ -22,6 +22,8 @@ jobs:
         go-version: '1.23.3'
 
     - name: Test
-      run: go generate ./... && go test -tags test -v ./...
+      run: |
+        go generate ./...
+        go test -tags test -v ./...
 
 
