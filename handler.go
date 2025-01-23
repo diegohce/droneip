@@ -9,10 +9,10 @@ import (
 
 	"github.com/diegohce/droneip/dronebl"
 
-	"github.com/diegohce/config"
-	mx2 "github.com/diegohce/mxcache"
+	"github.com/diegohce/droneip/config"
+	mx2 "github.com/diegohce/droneip/mxcache"
 
-	"github.com/diegohce/logger"
+	"github.com/diegohce/droneip/logger"
 )
 
 type CacheValue struct {

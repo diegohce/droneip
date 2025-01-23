@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	mx2 "github.com/diegohce/mxcache"
+	mx2 "github.com/diegohce/droneip/mxcache"
 	"github.com/go-redis/redis/v8"
 	"github.com/go-redis/redismock/v8"
 )

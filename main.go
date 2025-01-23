@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/diegohce/config"
-	"github.com/diegohce/logger"
+	"github.com/diegohce/droneip/config"
+	"github.com/diegohce/droneip/logger"
 
-	mx2 "github.com/diegohce/mxcache"
+	mx2 "github.com/diegohce/droneip/mxcache"
 )
 
 func main() {

@@ -5,11 +5,11 @@ import (
 
 	"github.com/diegohce/droneip/internal/version"
 
-	"github.com/diegohce/ctcodecs"
-	_ "github.com/diegohce/ctcodecs/allcodecs"
+	"github.com/diegohce/droneip/ctcodecs"
+	_ "github.com/diegohce/droneip/ctcodecs/allcodecs"
 
-	"github.com/diegohce/logger"
-	mx2 "github.com/diegohce/mxcache"
+	"github.com/diegohce/droneip/logger"
+	mx2 "github.com/diegohce/droneip/mxcache"
 
 	"github.com/go-redis/redis/v8"
 )

@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/diegohce/config"
-	mx2 "github.com/diegohce/mxcache"
+	"github.com/diegohce/droneip/config"
+	mx2 "github.com/diegohce/droneip/mxcache"
 )
 
 func TestService(t *testing.T) {
