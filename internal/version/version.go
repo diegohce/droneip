@@ -7,20 +7,16 @@ import (
 	"net/http"
 )
 
-func Version(w http.ResponseWriter, r *http.Request) {
+type versionHandler struct {
+	Version string `json:"version"`
+	Commit  string `json:"commit"`
+	When    string `json:"date"`
+}
 
-	ver := struct {
-		Version string `json:"version"`
-		Commit  string `json:"commit"`
-		When    string `json:"date"`
-	}{
-		Version: VERSION,
-		Commit:  COMMIT,
-		When:    WHEN,
-	}
+func (v *versionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	json.NewEncoder(w).Encode(ver)
+	json.NewEncoder(w).Encode(v)
 
 }

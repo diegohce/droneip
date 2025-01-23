@@ -32,7 +32,7 @@ func NewAdminCentre(cache mx2.MXCacher) *AdminCentre {
 	hc := healthcheck.HealthCheck(cache)
 
 	ac.r.Handle("GET /droneip/keys", http.HandlerFunc(ac.cacheKeys))
-	ac.r.Handle("GET /droneip/version", http.HandlerFunc(version.Version))
+	ac.r.Handle("GET /droneip/version", &version.Handler)
 	ac.r.Handle("GET /droneip/health_check", hc)
 
 	return &ac
