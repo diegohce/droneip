@@ -30,7 +30,7 @@ func (h *DroneHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	inspectHeader := config.Get("INSPECT_HEADER")
 	if inspectHeader != "" {
-		remoteIP = r.Header.Get(inspectHeader)
+		remoteIP = getRemoteIP(r.Header.Get(inspectHeader))
 	}
 	cacheKey := fmt.Sprintf("droneip-%s", remoteIP)
 
@@ -78,4 +78,14 @@ func (h *DroneHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	io.Copy(w, res.Body)
 
+}
+
+func getRemoteIP(ips string) string {
+	if !strings.Contains(ips, ",") {
+		return ips
+	}
+
+	ipList := strings.Split(ips, ",")
+
+	return strings.Trim(ipList[0], " ")
 }
