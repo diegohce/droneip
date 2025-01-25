@@ -22,6 +22,8 @@ func TestCache(t *testing.T) {
 		{cache: cacher("memory://")},
 		{cache: cacher("redis://127.0.0.1:6379/1")},
 		{cache: cacher("mem+redis://127.0.0.1:6379/1")},
+		{cache: cacher("rediscluster://127.0.0.1:6379/1")},
+		{cache: cacher("mem+rediscluster://127.0.0.1:6379/1")},
 	}
 
 	for _, c := range cases {
