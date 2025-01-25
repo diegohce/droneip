@@ -50,7 +50,7 @@ func TestService(t *testing.T) {
 		h.ServeHTTP(res, req)
 
 		if res.Result().StatusCode != c.responseStatus {
-			t.Fatalf("case %d: got status %d want status %d", i, res.Result().StatusCode, c.responseStatus)
+			t.Errorf("case %d: got status %d want status %d", i, res.Result().StatusCode, c.responseStatus)
 		}
 
 	}
@@ -87,7 +87,7 @@ func TestAdmin(t *testing.T) {
 		admin.ServeHTTP(res, req)
 
 		if res.Result().StatusCode != c.status {
-			t.Fatalf("case %d: got status %d want status %d", i, res.Result().StatusCode, c.status)
+			t.Errorf("case %d: got status %d want status %d", i, res.Result().StatusCode, c.status)
 		}
 
 	}

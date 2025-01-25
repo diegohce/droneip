@@ -15,7 +15,7 @@ func TestDrone(t *testing.T) {
 	for _, c := range cases {
 		err := Probe(c.ip)
 		if (err != nil) != c.found {
-			t.Fatalf("got ip %s found %t want found %t", c.ip, (err != nil), c.found)
+			t.Errorf("got ip %s found %t want found %t", c.ip, (err != nil), c.found)
 		}
 	}
 
