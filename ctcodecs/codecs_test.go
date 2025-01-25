@@ -38,13 +38,17 @@ func TestCodecs(t *testing.T) {
 		var buf bytes.Buffer
 
 		if err := codec.NewEncoder(&buf).Encode(&someGuy); err != nil {
-			t.Fatal(err)
+			t.Error(err)
 		}
 
 		var anotherGuy Guy
 
 		if err := codec.NewDecoder(&buf).Decode(&anotherGuy); err != nil {
-			t.Fatal(err)
+			t.Error(err)
+		}
+
+		if codec.MimeType() != ct {
+			t.Errorf("mime type: got %s want %s", codec.MimeType(), ct)
 		}
 	}
 }
@@ -53,13 +57,13 @@ func TestUnregisteredContentType(t *testing.T) {
 
 	_, err := ctcodecs.New("Baby-Shark")
 	if err == nil {
-		t.Fatal("expecting error for UnregisteredContentType")
+		t.Error("expecting error for UnregisteredContentType")
 	}
 }
 
 func TestCodecsList(t *testing.T) {
 	l := ctcodecs.List()
 	if len(l) <= 0 {
-		t.Fatal("empty codecs list")
+		t.Error("empty codecs list")
 	}
 }

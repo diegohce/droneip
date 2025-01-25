@@ -24,16 +24,20 @@ func TestCodec(t *testing.T) {
 	var buf bytes.Buffer
 
 	if err := codec.NewEncoder(&buf).Encode(&someGuy); err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
 
 	var anotherGuy Guy
 
 	if err := codec.NewDecoder(&buf).Decode(&anotherGuy); err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
 
 	b, _ := codec.Marshal(&someGuy)
 
 	codec.Unmarshal(b, &anotherGuy)
+
+	if codec.MimeType() != mimeType {
+		t.Errorf("mime type: got %s want %s", codec.MimeType(), mimeType)
+	}
 }

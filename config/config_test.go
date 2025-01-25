@@ -3,6 +3,7 @@ package config_test
 import (
 	"os"
 	"testing"
+	"time"
 
 	"github.com/diegohce/droneip/config"
 )
@@ -28,14 +29,14 @@ func TestHappyTrail(t *testing.T) {
 
 	for i, v := range values {
 		if v != expected[i] {
-			t.Fatal("expected", expected[i], "got", v)
+			t.Error("expected", expected[i], "got", v)
 		}
 	}
 
 	config.Set("PARAM", "pampam")
 
 	if v := config.Get("PARAM"); v != "pampam" {
-		t.Fatal("expected 'pampam' got", v)
+		t.Error("expected 'pampam' got", v)
 	}
 
 }
@@ -63,14 +64,34 @@ func TestNewValues(t *testing.T) {
 
 	for i, v := range values {
 		if v != expected[i] {
-			t.Fatal("expected", expected[i], "got", v)
+			t.Error("expected", expected[i], "got", v)
 		}
 	}
 
 	cfg.Set("PARAM", "pampam")
 
 	if v := cfg.Get("PARAM"); v != "pampam" {
-		t.Fatal("expected 'pampam' got", v)
+		t.Error("expected 'pampam' got", v)
+	}
+
+}
+
+func TestGetInt(t *testing.T) {
+
+	config.FromEnvWithPrefix("TEST_")
+
+	if config.GetInt("USERID", 70) != 76 {
+		t.Errorf("got %d want 76", config.GetInt("USERID", 70))
+	}
+
+}
+
+func TestGetDuration(t *testing.T) {
+
+	config.FromEnvWithPrefix("TEST_")
+
+	if config.GetDuration("DURATION") != time.Duration(10*time.Second) {
+		t.Errorf("got %d want 76", config.GetInt("USERID", 70))
 	}
 
 }
@@ -78,5 +99,7 @@ func TestNewValues(t *testing.T) {
 func TestMain(m *testing.M) {
 	os.Setenv("TEST_HOSTNAME", "localhost")
 	os.Setenv("TEST_USERNAME", "egorlami")
+	os.Setenv("TEST_USERID", "76")
+	os.Setenv("TEST_DURATION", "10s")
 	os.Exit(m.Run())
 }

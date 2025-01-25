@@ -1,16 +1,14 @@
-package mxcache_test
+package mxcache
 
 import (
 	"testing"
-
-	"github.com/diegohce/droneip/mxcache"
 )
 
 func Test00PersistenceSet(t *testing.T) {
 
-	cache, err := mxcache.NewMXCache("memory://mem/?persist=cache.dat")
+	cache, err := NewMXCache("memory://mem/?persist=cache.dat")
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
 
 	cache.Set("name", "Diego", 3600)
@@ -18,9 +16,9 @@ func Test00PersistenceSet(t *testing.T) {
 
 func Test01PersistenceGet(t *testing.T) {
 
-	cache, err := mxcache.NewMXCache("memory://mem/?persist=cache.dat")
+	cache, err := NewMXCache("memory://mem/?persist=cache.dat")
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
 
 	name := ""
