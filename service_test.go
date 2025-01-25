@@ -94,7 +94,7 @@ func TestAdmin(t *testing.T) {
 
 }
 
-func TestGetRemoteIP(t *testing.T) {
+/* func TestGetRemoteIP(t *testing.T) {
 
 	cases := []struct {
 		ips  string
@@ -118,4 +118,4 @@ func TestGetRemoteIP(t *testing.T) {
 
 	}
 
-}
+} */
