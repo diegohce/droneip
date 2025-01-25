@@ -24,6 +24,6 @@ jobs:
     - name: Test
       run: |
         go generate ./...
-        go test -tags test -v ./...
+        go test -tags test -v .
 
 
