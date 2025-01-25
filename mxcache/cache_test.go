@@ -6,7 +6,10 @@ import (
 )
 
 func cacher(uri string) MXCacher {
-	c, _ := NewMXCache(uri)
+	c, err := NewMXCache(uri)
+	if err != nil {
+		c, _ = NewMXCache("")
+	}
 	return c
 }
 
