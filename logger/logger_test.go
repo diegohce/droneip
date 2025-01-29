@@ -1,15 +1,13 @@
-package logger_test
+package logger
 
 import (
 	"strings"
 	"testing"
-
-	"github.com/diegohce/droneip/logger"
 )
 
 func TestLoggerWithFields(t *testing.T) {
 
-	l := logger.NewLogger("name", "diego", "age", 47)
+	l := NewLogger("name", "diego", "age", 47)
 
 	l.LogInfo("message 1", "dog", "simona").Write()
 
@@ -17,10 +15,28 @@ func TestLoggerWithFields(t *testing.T) {
 
 func TestLoggerWithoutFields(t *testing.T) {
 
-	l := logger.NewLogger()
+	l := NewLogger()
 
 	l.LogInfo("message 2", "dog", "simona").Write()
 
+}
+
+func TestLoggerLogError(t *testing.T) {
+	l := NewLogger()
+	l.LogError("message 2", "dog", "simona").Write()
+}
+
+func TestAddFields(t *testing.T) {
+
+	l := NewLogger()
+	l.AddFields("fixed_field", "fixed_value")
+}
+
+func TestLogLevels(t *testing.T) {
+	LogInfo("sample error log entry")
+	LogWarning("sample error log entry")
+	LogError("sample error log entry")
+	LogDebug("sample error log entry")
 }
 
 type testLoger string
@@ -32,7 +48,7 @@ func (tl *testLoger) WriteLogLine(l string) {
 func TestCreditCardMask(t *testing.T) {
 	var tl testLoger
 
-	logger.RegisterLogWriter(&tl)
+	RegisterLogWriter(&tl)
 
 	testCases := []struct {
 		input string
@@ -42,7 +58,7 @@ func TestCreditCardMask(t *testing.T) {
 	}
 
 	for _, c := range testCases {
-		logger.LogInfo(c.input).Write()
+		LogInfo(c.input).Write()
 
 		if strings.Contains(string(tl), c.input) {
 			t.Errorf("logline contains CC number")

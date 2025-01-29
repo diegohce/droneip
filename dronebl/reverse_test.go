@@ -10,7 +10,7 @@ func TestReverse(t *testing.T) {
 	rev := reverseOctets(ip)
 
 	if rev != expected {
-		t.Fatalf("got %s want %s", rev, expected)
+		t.Errorf("got %s want %s", rev, expected)
 	}
 
 }

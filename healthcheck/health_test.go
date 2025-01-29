@@ -1,6 +1,8 @@
 package healthcheck
 
 import (
+	"encoding/json"
+	"errors"
 	"net/http/httptest"
 	"testing"
 )
@@ -42,5 +44,33 @@ func TestHealthWithoutDependencies(t *testing.T) {
 	rr := httptest.NewRecorder()
 
 	handler.ServeHTTP(rr, rq)
+
+}
+
+type errService struct{}
+
+func (s *errService) Ping() error {
+	return errors.New("bad service")
+}
+
+func TestHealthNotOK(t *testing.T) {
+
+	handler := HealthCheck(&errService{}, &mockDB{}, &mockCache{}, &mockSomeService{})
+
+	rq := httptest.NewRequest("GET", "/", nil)
+	rr := httptest.NewRecorder()
+
+	handler.ServeHTTP(rr, rq)
+
+	response := struct {
+		Status string   `json:"status"`
+		Errors []string `json:"errors"`
+	}{}
+
+	json.NewDecoder(rr.Result().Body).Decode(&response)
+
+	if response.Status != "error" {
+		t.Errorf("status: got %s want error", response.Status)
+	}
 
 }
