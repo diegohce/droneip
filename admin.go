@@ -1,8 +1,13 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
+	"time"
 
+	"github.com/diegohce/droneip/config"
+	"github.com/diegohce/droneip/dronebl"
 	"github.com/diegohce/droneip/healthcheck"
 	"github.com/diegohce/droneip/internal/version"
 
@@ -34,6 +39,7 @@ func NewAdminCentre(cache mx2.MXCacher) *AdminCentre {
 	ac.r.Handle("GET /droneip/keys", http.HandlerFunc(ac.cacheKeys))
 	ac.r.Handle("GET /droneip/version", &version.Handler)
 	ac.r.Handle("GET /droneip/health_check", hc)
+	ac.r.Handle("POST /droneip/is_valid", http.HandlerFunc(ac.ipIsValid))
 
 	return &ac
 }
@@ -73,4 +79,53 @@ func (a *AdminCentre) cacheKeys(w http.ResponseWriter, r *http.Request) {
 	}
 
 	codec.NewEncoder(w).Encode(response)
+}
+
+func (a *AdminCentre) ipIsValid(w http.ResponseWriter, r *http.Request) {
+
+	rq := struct {
+		Addr string `json:"addr"`
+	}{}
+
+	ttl, err := time.ParseDuration(config.Get("CACHE_TTL", "24h"))
+	if err != nil {
+		ttl, _ = time.ParseDuration("24h")
+	}
+
+	codec, err := ctcodecs.New(r.Header.Get("Content-Type"))
+	if err != nil {
+		codec, _ = ctcodecs.New("application/json")
+	}
+
+	if err = codec.NewDecoder(r.Body).Decode(&rq); err != nil {
+		logger.LogError("error decoding request body", "err", err.Error()).Write()
+		http.Error(w, "error decoding request body: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	cacheKey := fmt.Sprintf("droneip-%s", rq.Addr)
+
+	cv := CacheValue{}
+
+	err = a.cache.Get(cacheKey, &cv)
+	if errors.Is(err, mx2.ErrNotFound) {
+		if err := dronebl.Probe(rq.Addr); err != nil {
+			logger.LogInfo("ip exists in dronebl DB",
+				"ip", rq.Addr, "source", "dronebl.org").Write()
+
+			cv.ValidIP = false
+		} else {
+			cv.ValidIP = true
+		}
+
+		a.cache.Set(cacheKey, &cv, int(ttl.Seconds()))
+	}
+
+	res := struct {
+		IsValid bool `json:"is_valid"`
+	}{
+		IsValid: cv.ValidIP,
+	}
+
+	codec.NewEncoder(w).Encode(&res)
 }
