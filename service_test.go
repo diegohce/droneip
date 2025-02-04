@@ -36,9 +36,11 @@ func TestService(t *testing.T) {
 		{"POST", "193.56.64.251", http.StatusTeapot},
 	}
 
+	store, _ := storage.Open("", "")
 	h := &DroneHandler{
 		cache:    cache,
 		cacheTTL: 24 * 60 * 60,
+		store:    store,
 	}
 
 	for i, c := range cases {
