@@ -11,6 +11,7 @@ import (
 	"time"
 
 	mx2 "github.com/diegohce/droneip/mxcache"
+	"github.com/diegohce/droneip/storage"
 	"github.com/go-redis/redis/v8"
 	"github.com/go-redis/redismock/v8"
 )
@@ -75,8 +76,8 @@ func TestAdminCentre(t *testing.T) {
 		cli:  cli,
 		mock: mock,
 	}
-
-	ac := NewAdminCentre(&red)
+	store, _ := storage.Open("", "")
+	ac := NewAdminCentre(&red, store)
 
 	cases := []struct {
 		IP   string

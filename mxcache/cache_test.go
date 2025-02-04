@@ -1,6 +1,7 @@
 package mxcache
 
 import (
+	"errors"
 	"testing"
 	"time"
 )
@@ -100,4 +101,16 @@ func TestCache(t *testing.T) {
 
 	}
 
+}
+
+func TestExpireErrors(t *testing.T) {
+	var ee ExpireErrors
+
+	ee = append(ee, errors.New("error1"), errors.New("error2"))
+
+	s := ee.Error()
+
+	if s != "error1, error2" {
+		t.Error("bad error concat")
+	}
 }

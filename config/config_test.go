@@ -96,6 +96,15 @@ func TestGetDuration(t *testing.T) {
 
 }
 
+func TestMandatory(t *testing.T) {
+
+	err := config.FromEnvWithPrefix("TEST_", "USERNAME", "MANDATORY")
+	if err == nil {
+		t.Errorf("got err == nil want mandatoy error")
+	}
+
+}
+
 func TestMain(m *testing.M) {
 	os.Setenv("TEST_HOSTNAME", "localhost")
 	os.Setenv("TEST_USERNAME", "egorlami")

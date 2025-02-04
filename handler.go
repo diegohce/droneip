@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/diegohce/droneip/dronebl"
+	"github.com/diegohce/droneip/storage"
 
 	"github.com/diegohce/droneip/config"
 	mx2 "github.com/diegohce/droneip/mxcache"
@@ -22,6 +23,7 @@ type CacheValue struct {
 type DroneHandler struct {
 	cache    mx2.MXCacher
 	cacheTTL int
+	store    storage.Storager
 }
 
 func (h *DroneHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -56,6 +58,7 @@ func (h *DroneHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		logger.LogInfo("ip exists in dronebl DB",
 			"ip", remoteIP, "source", "cache").Write()
 
+		h.store.Save(remoteIP)
 		w.WriteHeader(http.StatusTeapot)
 		return
 	}

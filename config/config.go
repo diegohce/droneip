@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -21,7 +22,7 @@ func (c configVars) FromEnv() {
 	c.FromEnvWithPrefix("")
 }
 
-func (c configVars) FromEnvWithPrefix(pref string) {
+func (c configVars) FromEnvWithPrefix(pref string, must ...string) error {
 	for _, v := range os.Environ() {
 		if strings.HasPrefix(v, pref) {
 			kv := strings.SplitN(v, "=", 2)
@@ -29,6 +30,14 @@ func (c configVars) FromEnvWithPrefix(pref string) {
 			c[key] = kv[1]
 		}
 	}
+
+	for _, m := range must {
+		if v, exists := c[m]; !exists || len(v) == 0 {
+			return fmt.Errorf("config: key %s is mandatory", m)
+		}
+	}
+
+	return nil
 }
 
 func (c configVars) Get(name string, def ...string) string {
@@ -110,6 +119,6 @@ func FromEnv() {
 	Values.FromEnv()
 }
 
-func FromEnvWithPrefix(pref string) {
-	Values.FromEnvWithPrefix(pref)
+func FromEnvWithPrefix(pref string, must ...string) error {
+	return Values.FromEnvWithPrefix(pref, must...)
 }
