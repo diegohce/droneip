@@ -10,15 +10,26 @@ import (
 	"github.com/diegohce/droneip/config"
 	"github.com/diegohce/droneip/logger"
 
+	"github.com/diegohce/droneip/storage"
+	_ "github.com/diegohce/droneip/storage/filestorage"
+	_ "github.com/diegohce/droneip/storage/httpstorage"
+	_ "github.com/diegohce/droneip/storage/memstorage"
+	_ "github.com/diegohce/droneip/storage/sqlstorage"
+
 	mx2 "github.com/diegohce/droneip/mxcache"
 )
 
 func main() {
 
-	config.FromEnvWithPrefix("DRONEIP_")
+	err := config.FromEnvWithPrefix("DRONEIP_", "DESTINATION_URL")
+	if err != nil {
+		logger.LogError("config error", "err", err.Error()).Write()
+		os.Exit(1)
+	}
 
-	if config.Get("DESTINATION_URL", "NN") == "NN" {
-		logger.LogError("destination URL not set").Write()
+	store, err := storage.Open(config.Get("STORAGE_TYPE"), config.Get("STORAGE_CONFIG"))
+	if err != nil {
+		logger.LogError("error starting storage", "err", err.Error()).Write()
 		os.Exit(1)
 	}
 
@@ -28,7 +39,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	ac := NewAdminCentre(cache)
+	ac := NewAdminCentre(cache, store)
 	go http.ListenAndServe(config.Get("ADMIN_BIND", ":8081"), ac)
 
 	ttl, err := time.ParseDuration(config.Get("CACHE_TTL", "24h"))
@@ -38,6 +49,7 @@ func main() {
 	handler := DroneHandler{
 		cache:    cache,
 		cacheTTL: int(ttl.Seconds()),
+		store:    store,
 	}
 
 	http.Handle("/", &handler)

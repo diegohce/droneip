@@ -10,6 +10,7 @@ import (
 	"github.com/diegohce/droneip/dronebl"
 	"github.com/diegohce/droneip/healthcheck"
 	"github.com/diegohce/droneip/internal/version"
+	"github.com/diegohce/droneip/storage"
 
 	"github.com/diegohce/droneip/ctcodecs"
 	_ "github.com/diegohce/droneip/ctcodecs/allcodecs"
@@ -27,13 +28,14 @@ type redisCache interface {
 type AdminCentre struct {
 	cache mx2.MXCacher
 	r     *http.ServeMux
+	store storage.Storager
 }
 
-func NewAdminCentre(cache mx2.MXCacher) *AdminCentre {
+func NewAdminCentre(cache mx2.MXCacher, store storage.Storager) *AdminCentre {
 
 	r := http.ServeMux{}
 
-	ac := AdminCentre{cache, &r}
+	ac := AdminCentre{cache, &r, store}
 	hc := healthcheck.HealthCheck(cache)
 
 	ac.r.Handle("GET /droneip/keys", http.HandlerFunc(ac.cacheKeys))
@@ -125,6 +127,10 @@ func (a *AdminCentre) ipIsValid(w http.ResponseWriter, r *http.Request) {
 		IsValid bool `json:"is_valid"`
 	}{
 		IsValid: cv.ValidIP,
+	}
+
+	if !cv.ValidIP {
+		a.store.Save(rq.Addr)
 	}
 
 	codec.NewEncoder(w).Encode(&res)

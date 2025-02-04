@@ -8,6 +8,7 @@ import (
 
 	"github.com/diegohce/droneip/config"
 	mx2 "github.com/diegohce/droneip/mxcache"
+	"github.com/diegohce/droneip/storage"
 )
 
 func TestService(t *testing.T) {
@@ -35,9 +36,11 @@ func TestService(t *testing.T) {
 		{"POST", "193.56.64.251", http.StatusTeapot},
 	}
 
+	store, _ := storage.Open("", "")
 	h := &DroneHandler{
 		cache:    cache,
 		cacheTTL: 24 * 60 * 60,
+		store:    store,
 	}
 
 	for i, c := range cases {
@@ -78,8 +81,8 @@ func TestAdmin(t *testing.T) {
 			cache, _ = newFakeRedis(c.cacheURI)
 
 		}
-
-		admin := NewAdminCentre(cache)
+		store, _ := storage.Open("", "")
+		admin := NewAdminCentre(cache, store)
 
 		req := httptest.NewRequest("GET", "/droneip/keys", nil)
 		res := httptest.NewRecorder()
