@@ -4,6 +4,7 @@ import "testing"
 
 func TestMemStorage(t *testing.T) {
 	ms, _ := openMemStorage("3")
+	defer ms.Close()
 
 	ms.Save("1.1.1.1")
 	ms.Save("2.2.2.2")

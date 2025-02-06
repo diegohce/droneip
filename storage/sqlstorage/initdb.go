@@ -11,7 +11,7 @@ var (
 	}
 )
 
-func InitDB(name string, dbx *sqlx.DB) error {
+func initDB(name string, dbx *sqlx.DB) error {
 
 	fn, ok := initdbfuncs[name]
 	if !ok {

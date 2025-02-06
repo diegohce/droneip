@@ -40,6 +40,10 @@ func (s *httpStorage) List() ([]string, error) {
 	return nil, errors.New("no local copy of banned ips")
 }
 
+func (s *httpStorage) Close() error {
+	return nil
+}
+
 func init() {
 	storage.Register("http", openHttpStorage)
 }

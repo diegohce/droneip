@@ -17,8 +17,6 @@ func (h HealthCheckFunc) Ping() error {
 
 func HealthCheck(pingers ...Pinger) http.Handler {
 
-	//pingers := listPingers(opts)
-
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var err error
 
@@ -47,19 +45,3 @@ func HealthCheck(pingers ...Pinger) http.Handler {
 		}
 	})
 }
-
-/*func listPingers(opts any) []pinger {
-	var pingers []pinger
-
-	v := reflect.ValueOf(opts)
-
-	for i := 0; i < v.NumField(); i++ {
-		if v.Field(i).CanInterface() {
-			p, ok := v.Field(i).Interface().(pinger)
-			if ok {
-				pingers = append(pingers, p)
-			}
-		}
-	}
-	return pingers
-}*/

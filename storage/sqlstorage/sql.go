@@ -4,9 +4,9 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/diegohce/droneip/logger"
 	"github.com/diegohce/droneip/storage"
 	"github.com/jmoiron/sqlx"
+	"modernc.org/sqlite"
 )
 
 type sqlStorage struct {
@@ -29,7 +29,7 @@ func openSQLStorage(dsn string) (storage.Storager, error) {
 		return nil, err
 	}
 
-	if err = InitDB(u.Scheme, dbx); err != nil {
+	if err = initDB(u.Scheme, dbx); err != nil {
 		dbx.Close()
 		return nil, err
 	}
@@ -49,6 +49,10 @@ func (s *sqlStorage) List() ([]string, error) {
 	return listIPs(s.dbx)
 }
 
+func (s *sqlStorage) Close() error {
+	return s.dbx.Close()
+}
+
 func init() {
 	storage.Register("sql", openSQLStorage)
 }
@@ -56,7 +60,16 @@ func init() {
 func saveIP(dbx *sqlx.DB, ip string) error {
 
 	_, err := dbx.NamedExec("INSERT INTO ips (ip) VALUES (:ip)", map[string]interface{}{"ip": ip})
-	logger.LogInfo("saveIP: error", "err", err.Error()).Write()
+	if err != nil {
+		sqlErr, ok := err.(*sqlite.Error)
+		if ok {
+			if sqlErr.Code() != 2067 { //UNIQUE contraint fail
+				return err
+			}
+		} else {
+			return err
+		}
+	}
 	return nil
 }
 

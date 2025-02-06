@@ -23,6 +23,7 @@ func TestHttpStorage(t *testing.T) {
 	defer server.Close()
 
 	hs, _ := openHttpStorage(server.URL + "/")
+	defer hs.Close()
 
 	err := hs.Save("1.1.1.1")
 	if err != nil {
