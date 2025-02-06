@@ -58,6 +58,10 @@ func (s *fileStorage) List() ([]string, error) {
 	return ips, nil
 }
 
+func (s *fileStorage) Close() error {
+	return nil
+}
+
 func init() {
 	storage.Register("file", openFileStorage)
 }

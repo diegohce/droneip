@@ -53,6 +53,10 @@ func (s *memStorage) List() ([]string, error) {
 	return ips, nil
 }
 
+func (s *memStorage) Close() error {
+	return nil
+}
+
 func init() {
 	storage.Register("mem", openMemStorage)
 }

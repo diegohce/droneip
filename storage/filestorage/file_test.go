@@ -8,6 +8,7 @@ import (
 func TestFileStorage(t *testing.T) {
 	fs, _ := openFileStorage("file:///tmp/droneip-storage.txt")
 	defer os.Remove("/tmp/droneip-storage.txt")
+	defer fs.Close()
 
 	fs.Save("1.1.1.1")
 	fs.Save("2.2.2.2")

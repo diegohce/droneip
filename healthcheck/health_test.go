@@ -74,3 +74,16 @@ func TestHealthNotOK(t *testing.T) {
 	}
 
 }
+
+func TestHealthCheckFunc(t *testing.T) {
+
+	hc := HealthCheckFunc(func() error {
+		return nil
+	})
+
+	err := hc.Ping()
+	if err != nil {
+		t.Error(err)
+	}
+
+}
