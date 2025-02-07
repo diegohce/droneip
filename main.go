@@ -9,14 +9,10 @@ import (
 
 	"github.com/diegohce/droneip/config"
 	"github.com/diegohce/droneip/logger"
+	"github.com/diegohce/droneip/mxcache"
 
 	"github.com/diegohce/droneip/storage"
-	_ "github.com/diegohce/droneip/storage/filestorage"
-	_ "github.com/diegohce/droneip/storage/httpstorage"
-	_ "github.com/diegohce/droneip/storage/memstorage"
-	_ "github.com/diegohce/droneip/storage/sqlstorage"
-
-	mx2 "github.com/diegohce/droneip/mxcache"
+	_ "github.com/diegohce/droneip/storage/storages"
 )
 
 func main() {
@@ -33,7 +29,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	cache, err := mx2.NewMXCache(config.Get("CACHE_URL", ""))
+	cache, err := mxcache.NewMXCache(config.Get("CACHE_URL", ""))
 	if err != nil {
 		logger.LogError("error starting cache", "err", err.Error()).Write()
 		os.Exit(1)

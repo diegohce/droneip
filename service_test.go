@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/diegohce/droneip/config"
-	mx2 "github.com/diegohce/droneip/mxcache"
+	"github.com/diegohce/droneip/mxcache"
 	"github.com/diegohce/droneip/storage"
 )
 
@@ -21,7 +21,7 @@ func TestService(t *testing.T) {
 	config.Set("INSPECT_HEADER", "X-TestHeader")
 	config.Set("DESTINATION_URL", remoteServer.URL)
 
-	cache, _ := mx2.NewMXCache("memory://")
+	cache, _ := mxcache.NewMXCache("memory://")
 
 	cases := []struct {
 		method         string
@@ -72,10 +72,10 @@ func TestAdmin(t *testing.T) {
 	}
 
 	for i, c := range cases {
-		var cache mx2.MXCacher
+		var cache mxcache.MXCacher
 
 		if strings.HasPrefix(c.cacheURI, "memory") {
-			cache, _ = mx2.NewMXCache(c.cacheURI)
+			cache, _ = mxcache.NewMXCache(c.cacheURI)
 
 		} else {
 			cache, _ = newFakeRedis(c.cacheURI)

@@ -10,13 +10,13 @@ import (
 	"github.com/diegohce/droneip/dronebl"
 	"github.com/diegohce/droneip/healthcheck"
 	"github.com/diegohce/droneip/internal/version"
+	"github.com/diegohce/droneip/mxcache"
 	"github.com/diegohce/droneip/storage"
 
 	"github.com/diegohce/droneip/ctcodecs"
 	_ "github.com/diegohce/droneip/ctcodecs/allcodecs"
 
 	"github.com/diegohce/droneip/logger"
-	mx2 "github.com/diegohce/droneip/mxcache"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -26,12 +26,12 @@ type redisCache interface {
 }
 
 type AdminCentre struct {
-	cache mx2.MXCacher
+	cache mxcache.MXCacher
 	r     *http.ServeMux
 	store storage.Storager
 }
 
-func NewAdminCentre(cache mx2.MXCacher, store storage.Storager) *AdminCentre {
+func NewAdminCentre(cache mxcache.MXCacher, store storage.Storager) *AdminCentre {
 
 	r := http.ServeMux{}
 
@@ -42,6 +42,7 @@ func NewAdminCentre(cache mx2.MXCacher, store storage.Storager) *AdminCentre {
 	ac.r.Handle("GET /droneip/version", &version.Handler)
 	ac.r.Handle("GET /droneip/health_check", hc)
 	ac.r.Handle("POST /droneip/is_valid", http.HandlerFunc(ac.ipIsValid))
+	ac.r.Handle("GET /droneip/history", http.HandlerFunc(ac.ipHistory))
 
 	return &ac
 }
@@ -80,6 +81,7 @@ func (a *AdminCentre) cacheKeys(w http.ResponseWriter, r *http.Request) {
 		Keys: result.Val(),
 	}
 
+	w.Header().Set("Content-Type", codec.MimeType())
 	codec.NewEncoder(w).Encode(response)
 }
 
@@ -110,7 +112,7 @@ func (a *AdminCentre) ipIsValid(w http.ResponseWriter, r *http.Request) {
 	cv := CacheValue{}
 
 	err = a.cache.Get(cacheKey, &cv)
-	if errors.Is(err, mx2.ErrNotFound) {
+	if errors.Is(err, mxcache.ErrNotFound) {
 		if err := dronebl.Probe(rq.Addr); err != nil {
 			logger.LogInfo("ip exists in dronebl DB",
 				"ip", rq.Addr, "source", "dronebl.org").Write()
@@ -133,5 +135,24 @@ func (a *AdminCentre) ipIsValid(w http.ResponseWriter, r *http.Request) {
 		a.store.Save(rq.Addr)
 	}
 
+	w.Header().Set("Content-Type", codec.MimeType())
 	codec.NewEncoder(w).Encode(&res)
+}
+
+func (a *AdminCentre) ipHistory(w http.ResponseWriter, r *http.Request) {
+
+	codec, err := ctcodecs.New(r.Header.Get("Content-Type"))
+	if err != nil {
+		codec, _ = ctcodecs.New("application/json")
+	}
+
+	hist, err := a.store.List()
+	if err != nil {
+		logger.LogError("error reading history", "err", err.Error()).Write()
+		http.Error(w, "error reading history: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", codec.MimeType())
+	codec.NewEncoder(w).Encode(&hist)
 }

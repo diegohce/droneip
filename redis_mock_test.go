@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	mx2 "github.com/diegohce/droneip/mxcache"
+	"github.com/diegohce/droneip/mxcache"
 	"github.com/go-redis/redis/v8"
 	"github.com/go-redis/redismock/v8"
 )
@@ -14,7 +14,7 @@ type FakeRedis struct {
 	mock redismock.ClientMock
 }
 
-func newFakeRedis(uri string) (mx2.MXCacher, error) {
+func newFakeRedis(uri string) (mxcache.MXCacher, error) {
 	cli, mock := redismock.NewClientMock()
 
 	c := FakeRedis{
@@ -44,8 +44,8 @@ func (c *FakeRedis) Set(key string, data interface{}, ex int) error {
 	return nil
 }
 
-func (c *FakeRedis) Expire(pattern string) (mx2.ExpiredKeys, error) {
-	return mx2.ExpiredKeys{}, nil
+func (c *FakeRedis) Expire(pattern string) (mxcache.ExpiredKeys, error) {
+	return mxcache.ExpiredKeys{}, nil
 }
 
 func (c *FakeRedis) Incr(key string) (int64, error) {

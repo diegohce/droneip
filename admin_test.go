@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	mx2 "github.com/diegohce/droneip/mxcache"
+	"github.com/diegohce/droneip/mxcache"
 	"github.com/diegohce/droneip/storage"
 	"github.com/go-redis/redis/v8"
 	"github.com/go-redis/redismock/v8"
@@ -32,7 +32,7 @@ func (c *MXRedisMock) Get(key string, i interface{}) error {
 		if err != redis.Nil {
 			return err
 		}
-		return mx2.ErrNotFound
+		return mxcache.ErrNotFound
 	}
 
 	json.Unmarshal([]byte(result.Val()), i)
@@ -44,8 +44,8 @@ func (c *MXRedisMock) Set(key string, data interface{}, ex int) error {
 	return nil
 }
 
-func (c *MXRedisMock) Expire(pattern string) (mx2.ExpiredKeys, error) {
-	return mx2.ExpiredKeys{}, nil
+func (c *MXRedisMock) Expire(pattern string) (mxcache.ExpiredKeys, error) {
+	return mxcache.ExpiredKeys{}, nil
 }
 
 func (c *MXRedisMock) Incr(key string) (int64, error) {
@@ -109,4 +109,22 @@ func TestAdminCentre(t *testing.T) {
 		}
 	}
 
+}
+
+func TestAdminCentreHistory(t *testing.T) {
+
+	cli, mock := redismock.NewClientMock()
+
+	red := MXRedisMock{
+		cli:  cli,
+		mock: mock,
+	}
+	store, _ := storage.Open("", "")
+	ac := NewAdminCentre(&red, store)
+
+	req := httptest.NewRequest(http.MethodGet, "/droneip/history", nil)
+	res := httptest.NewRecorder()
+
+	ac.ipHistory(res, req)
+	t.Log(res.Body.String())
 }
